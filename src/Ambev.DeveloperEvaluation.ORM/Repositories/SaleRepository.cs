@@ -42,5 +42,13 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
             await _context.SaveChangesAsync(cancellationToken);
             return sale;
         }
+
+        public async Task<List<Sale>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Sales
+                .Include(s => s.Items)
+                .ToListAsync(cancellationToken);
+        }
+
     }
 }
