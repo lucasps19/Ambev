@@ -9,5 +9,8 @@
         public decimal Discount { get; set; }
 
         public decimal Total => (UnitPrice * Quantity) - Discount;
+
+        public Guid SaleId { get; set; }
+        public Sale Sale { get; set; } = null!;
     }
 }

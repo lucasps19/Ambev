@@ -31,7 +31,7 @@ public class Program
 
             builder.Services.AddDbContext<DefaultContext>(options =>
                 options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    builder.Configuration.GetConnectionString("PostgreSql"),
                     b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
                 )
             );
@@ -52,22 +52,36 @@ public class Program
 
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-            var app = builder.Build();
-            app.UseMiddleware<ValidationExceptionMiddleware>();
+            builder.WebHost.UseUrls("http://0.0.0.0:8080");
 
-            if (app.Environment.IsDevelopment())
+            builder.Services.AddCors(options =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
+            var app = builder.Build();
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
+            // Mostra exceções completas em qualquer ambiente
+            app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAll");
 
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseBasicHealthChecks();
-
             app.MapControllers();
 
             app.Run();

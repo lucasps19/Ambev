@@ -1,6 +1,6 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale
 {
@@ -18,21 +18,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.UpdateSale
             var existing = await _saleRepository.GetByIdAsync(request.Id, cancellationToken);
             if (existing == null) throw new KeyNotFoundException("Venda não encontrada.");
 
-            existing.SaleNumber = request.SaleNumber;
-            existing.CustomerId = request.CustomerId;
-            existing.Branch = request.Branch;
-            existing.Items.Clear();
-
-            foreach (var item in request.Items)
-            {
-                existing.AddItem(new SaleItem
-                {
-                    Id = Guid.NewGuid(),
-                    ProductName = item.ProductName,
-                    Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice
-                });
-            }
+            request.Update(existing);
 
             await _saleRepository.UpdateAsync(existing, cancellationToken);
 

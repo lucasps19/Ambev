@@ -38,6 +38,14 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
 
         public async Task<Sale> UpdateAsync(Sale sale, CancellationToken cancellationToken = default)
         {
+            var salesItensExistings = await _context.SalesItens.Where(x => x.SaleId  == sale.Id).ToListAsync();
+
+            if (salesItensExistings.Count() > 0)
+                _context.SalesItens.RemoveRange(salesItensExistings);
+
+            foreach(var item in sale.Items)
+                await _context.SalesItens.AddAsync(item);
+
             _context.Sales.Update(sale);
             await _context.SaveChangesAsync(cancellationToken);
             return sale;
@@ -49,6 +57,5 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
                 .Include(s => s.Items)
                 .ToListAsync(cancellationToken);
         }
-
     }
 }
