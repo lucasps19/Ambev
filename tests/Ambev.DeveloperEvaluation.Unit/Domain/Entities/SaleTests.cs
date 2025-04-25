@@ -56,17 +56,18 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities
             });
 
             act.Should().Throw<InvalidOperationException>()
-                .WithMessage("Quantidade do mesmo item não pode ultrapassar 20.");
+                .WithMessage("Máximo de 20 unidades por item permitido.");
         }
 
         [Fact]
         public void Should_Accumulate_Quantities_For_Same_Product()
         {
             var sale = new Sale();
+            var id = Guid.NewGuid();
 
             sale.AddItem(new SaleItem
             {
-                Id = Guid.NewGuid(),
+                Id = id,
                 ProductName = "Produto W",
                 Quantity = 10,
                 UnitPrice = 20m
@@ -74,7 +75,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Entities
 
             sale.AddItem(new SaleItem
             {
-                Id = Guid.NewGuid(),
+                Id = id,
                 ProductName = "Produto W",
                 Quantity = 5,
                 UnitPrice = 20m

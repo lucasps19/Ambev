@@ -18,10 +18,31 @@
 
         public void AddItem(SaleItem item)
         {
+            var discount = 0m;
+
+            var existingItem = Items.FirstOrDefault(x => x.Id == item.Id);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity = item.Quantity + existingItem.Quantity;
+
+                if (existingItem.Quantity > 20)
+                    throw new InvalidOperationException("Máximo de 20 unidades por item permitido.");
+
+                
+                if (existingItem.Quantity >= 10)
+                    discount = existingItem.UnitPrice * existingItem.Quantity * 0.20m;
+                else if (existingItem.Quantity >= 4)
+                    discount = existingItem.UnitPrice * existingItem.Quantity * 0.10m;
+
+                item.Discount = discount;
+
+                return;
+            }
+
             if (item.Quantity > 20)
                 throw new InvalidOperationException("Máximo de 20 unidades por item permitido.");
 
-            var discount = 0m;
             if (item.Quantity >= 10)
                 discount = item.UnitPrice * item.Quantity * 0.20m;
             else if (item.Quantity >= 4)
